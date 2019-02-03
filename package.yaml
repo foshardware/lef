@@ -1,0 +1,23 @@
+name:                lef
+version:             0.1.0.0
+github:              "foshardware/lef"
+license:             BSD3
+author:              "Andreas Westerwick"
+maintainer:          "westerwick@pconas.de"
+copyright:           "2019 Andreas Westerwick"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+description:         Please see the README on GitHub at <https://github.com/foshardware/lef#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- array
+- parsec
+- parsec-numbers
+- text
+
+library:
+  source-dirs: src
