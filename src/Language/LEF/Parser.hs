@@ -28,6 +28,7 @@ lef = LEF
   <*> many layer
   <*> many via
   <*> many viaRule
+  <*> spacing
   <*> many site
   <*> many1 macro
   <*  endLibrary
@@ -94,15 +95,18 @@ layerName = layer_ *> ident <?> "layer_name"
 
 layerOption :: Parser LayerOption
 layerOption
-  =   Type        <$> (type_        *> ident ) 
-  <|> Spacing     <$> (spacing_     *> double)
-  <|> Direction   <$> (direction_   *> layerDirection)
-  <|> Pitch       <$> (pitch_       *> double)
-  <|> Offset      <$> (offset_      *> double)
-  <|> Width       <$> (width_       *> double)
-  <|> Resistance  <$> (resistance_  *> ident ) <*> double
-  <|> Capacitance <$> (capacitance_ *> ident ) <*> double
-  <|> EdgeCapacitance <$> (capacitance_ *> double)
+  =   Type         <$> (type_        *> ident ) 
+  <|> LayerSpacing <$> (spacing_     *> double)
+  <|> Direction    <$> (direction_   *> layerDirection)
+  <|> Pitch        <$> (pitch_       *> double)
+  <|> Offset       <$> (offset_      *> double <* optional double)
+  <|> Thickness    <$> (thickness_   *> double)
+  <|> Height       <$> (height_      *> double)
+  <|> Width        <$> (width_       *> double)
+  <|> Resistance   <$> (resistance_  *> optional ident) <*> double
+  <|> SpacingTable <$> (spacingtable_ *> spacingTable)
+  <|> Capacitance  <$> (capacitance_ *> ident ) <*> double
+  <|> EdgeCapacitance <$> (edgecapacitance_ *> double)
   <?> "layer_option"
 
 via :: Parser Via
@@ -159,10 +163,27 @@ viaRuleLayerOption
   =   ViaRuleLayerOptionDirection     <$> (direction_ *> layerDirection)
   <|> ViaRuleLayerOptionWidth         <$> (width_     *> double) <*> (to_ *> double)
   <|> ViaRuleLayerOptionSpacing       <$> (spacing_   *> double) <*> (by_ *> double)
+  <|> ViaRuleLayerOptionEnclosure     <$> (enclosure_ *> double) <*> double
   <|> ViaRuleLayerOptionOverhang      <$> (overhang_  *> double)
   <|> ViaRuleLayerOptionMetalOverhang <$> (metaloverhang_ *> double)
   <|> ViaRuleLayerOptionRect          <$> (rect_ *> double) <*> double <*> double <*> double
   <?> "via_rule_layer_option"
+
+
+spacing :: Parser Spacing
+spacing = spacing_ >> Spacing
+  <$> many samenet
+  <*  (end_ *> spacing_)
+  <?> "spacing"
+
+samenet :: Parser Samenet
+samenet = samenet_ >> Samenet
+  <$> ident
+  <*> ident
+  <*> double
+  <*  optional stack_
+  <?> "samenet" 
+
 
 site :: Parser Site
 site = Site
@@ -208,7 +229,7 @@ macroOption
 
 macroObsInfo :: Parser MacroObsInfo
 macroObsInfo
-  =   MacroObsLayer <$> (layer_ *> ident)
+  =   MacroObsLayer <$> (layer_ *> ident) <*> many (polygon_ *> many1 double)
   <|> MacroObsRect  <$> (rect_ *> double) <*> double <*> double <*> double
   <?> "macro_obs_info"
 
@@ -219,11 +240,15 @@ macroPinOption
   <|> MacroPinDirection <$> (direction_ *> portDirection) <*> optional ident
   <|> MacroPinShape     <$> (shape_ *> ident)
   <|> MacroPinPort      <$> (port_  *> many macroPinPortInfo) <* end_
+  <|> MacroPinAntennaPartialMetalArea     <$> (antennapartialmetalarea_ *> double) <*> (layer_ *> ident)
+  <|> MacroPinAntennaPartialMetalSideArea <$> (antennapartialmetalsidearea_ *> double) <*> (layer_ *> ident)
+  <|> MacroPinAntennaGateArea             <$> (antennagatearea_ *> double)
+  <|> MacroPinAntennaDiffArea             <$> (antennadiffarea_ *> double)
   <?> "macro_pin_option"
 
 macroPinPortInfo :: Parser MacroPinPortInfo
 macroPinPortInfo
-  =   MacroPinPortLayer <$> (layer_ *> ident )
+  =   MacroPinPortLayer <$> (layer_ *> ident ) <*> many1 (polygon_ *> many1 double)
   <|> MacroPinPortRect  <$> (rect_  *> double) <*> double <*> double <*> double
   <|> MacroPinPortClass <$> (class_ *> ident )
   <|> MacroPinPortWidth <$> (width_ *> double)
@@ -245,6 +270,13 @@ layerDirection
   =   Horizontal <$ horizontal_
   <|> Vertical   <$ vertical_
   <?> "layer_direction"
+
+spacingTable :: Parser Table 
+spacingTable = parallelrunlength_ >> Table
+  <$> many1 double
+  <*> many1 (width_ *> many1 double)
+  <?> "spacing_table"
+
 
 boolean :: Parser Bool
 boolean = True <$ on_ <|> False <$ off_ <?> "boolean"
@@ -283,8 +315,17 @@ p t = maybeToken $ \r -> if r == t then Just () else Nothing
 end_ = p Tok_End
 library_ = p Tok_Library
 version_ = p Tok_Version
+edgecapacitance_ = p Tok_EdgeCapacitance
 capacitance_ = p Tok_Capacitance
+spacingtable_ = p Tok_Spacingtable
+parallelrunlength_ = p Tok_Parallelrunlength
+samenet_ = p Tok_Samenet
+antennadiffarea_ = p Tok_Antennadiffarea
+antennagatearea_ = p Tok_Antennagatearea
+antennapartialmetalsidearea_ = p Tok_Antennapartialmetalsidearea
+antennapartialmetalarea_ = p Tok_Antennapartialmetalarea
 resistance_ = p Tok_Resistance
+height_ = p Tok_Height
 width_ = p Tok_Width
 offset_ = p Tok_Offset
 pitch_ = p Tok_Pitch
@@ -309,6 +350,7 @@ viarule_ = p Tok_ViaRule
 manufacturinggrid_ = p Tok_ManufacturingGrid
 clearancemeasure_ = p Tok_ClearanceMeasure
 symmetry_ = p Tok_Symmetry
+stack_ = p Tok_Stack
 class_ = p Tok_Class
 size_ = p Tok_Size
 site_ = p Tok_Site
@@ -320,6 +362,7 @@ on_ = p Tok_On
 off_ = p Tok_Off
 via_ = p Tok_Via
 overhang_ = p Tok_Overhang
+enclosure_ = p Tok_Enclosure
 path_ = p Tok_Path
 port_ = p Tok_Port
 shape_ = p Tok_Shape
@@ -328,5 +371,7 @@ output_ = p Tok_Output
 inout_ = p Tok_Inout
 horizontal_ = p Tok_Horizontal
 vertical_ = p Tok_Vertical
+thickness_ = p Tok_Thickness
 power_ = p Tok_Power
 ground_ = p Tok_Ground
+polygon_ = p Tok_Polygon

@@ -20,12 +20,8 @@ $any     = [.\n\r]
 
 @preprocessor = \# .* @newline
 
--- C# actually defines a letter to be any character (or escape sequence)
--- from the Unicode classes Lu, Ll, Lt, Lm, Lo or Nl. Identifiers must
--- start with a letter or an underscore, but can then also contain
--- characters from the classes Mn, Mc, Nd, Pc or Cf.
 $ident_start = [a-zA-Z_\@]
-$ident_part  = [a-zA-Z_0-9]
+$ident_part  = [a-zA-Z_\-0-9]
 $const_part  = [A-Z_]
 
 $digit     = [0-9]
@@ -79,7 +75,9 @@ SPACING          { constTok Tok_Spacing }
 DIRECTION        { constTok Tok_Direction }
 PITCH            { constTok Tok_Pitch }
 OFFSET           { constTok Tok_Offset }
+THICKNESS        { constTok Tok_Thickness }
 PATH             { constTok Tok_Path }
+HEIGHT           { constTok Tok_Height }
 WIDTH            { constTok Tok_Width }
 RESISTANCE       { constTok Tok_Resistance }
 EDGECAPACITANCE  { constTok Tok_EdgeCapacitance }
@@ -89,10 +87,15 @@ RECT             { constTok Tok_Rect }
 VIARULE	         { constTok Tok_ViaRule }
 TO               { constTok Tok_To }
 BY               { constTok Tok_By }
+SAMENET          { constTok Tok_Samenet }
+ENCLOSURE        { constTok Tok_Enclosure }
+SPACINGTABLE     { constTok Tok_Spacingtable }
+PARALLELRUNLENGTH { constTok Tok_Parallelrunlength }
 OVERHANG         { constTok Tok_Overhang }
 METALOVERHANG	 { constTok Tok_MetalOverhang }
 SITE             { constTok Tok_Site }
 SYMMETRY         { constTok Tok_Symmetry }
+STACK            { constTok Tok_Stack }
 CLASS            { constTok Tok_Class }
 SIZE             { constTok Tok_Size }
 MACRO            { constTok Tok_Macro }
@@ -108,7 +111,14 @@ INOUT            { constTok Tok_Inout }
 HORIZONTAL       { constTok Tok_Horizontal }
 VERTICAL         { constTok Tok_Vertical }
 POWER            { constTok Tok_Power }
+power            { constTok Tok_Power }
 GROUND           { constTok Tok_Ground }
+ground           { constTok Tok_Ground }
+POLYGON          { constTok Tok_Polygon }
+ANTENNAPARTIALMETALAREA      { constTok Tok_Antennapartialmetalarea }
+ANTENNAPARTIALMETALSIDEAREA  { constTok Tok_Antennapartialmetalsidearea }
+ANTENNAGATEAREA              { constTok Tok_Antennagatearea }
+ANTENNADIFFAREA              { constTok Tok_Antennadiffarea }
 
 -- Integer literals
 \-    $digit+     @int_suffix? { textTok Tok_Number }

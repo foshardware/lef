@@ -5,7 +5,7 @@ import Data.Text (Text)
 
 type Ident = Text
 
-data LEF = LEF [Option] [Layer] [Via] [ViaRule] [Site] [Macro]
+data LEF = LEF [Option] [Layer] [Via] [ViaRule] Spacing [Site] [Macro]
   deriving (Eq, Show)
 
 data Option
@@ -29,14 +29,17 @@ type LayerName = Ident
 
 data LayerOption
   = Type Ident
-  | Spacing Double
+  | LayerSpacing Double
   | Direction LayerDirection
   | Pitch Double
   | Offset Double
+  | Thickness Double
+  | Height Double
   | Width Double
-  | Resistance Ident Double
+  | Resistance (Maybe Ident) Double
   | Capacitance Ident Double
   | EdgeCapacitance Double
+  | SpacingTable Table
   deriving (Eq, Show)
 
 data PortDirection = Input | Output | InputOutput
@@ -75,12 +78,21 @@ data ViaRuleLayerOption
   | ViaRuleLayerOptionWidth Double Double
   | ViaRuleLayerOptionWidthDiscrete Double Integer
   | ViaRuleLayerOptionOverhang Double
+  | ViaRuleLayerOptionEnclosure Double Double
   | ViaRuleLayerOptionOverhangDiscrete Integer
   | ViaRuleLayerOptionMetalOverhang Double
   | ViaRuleLayerOptionMetalOverhangDiscrete Integer
   | ViaRuleLayerOptionRect Double Double Double Double
   | ViaRuleLayerOptionSpacing Double Double
   deriving (Eq, Show)
+
+
+data Spacing = Spacing [Samenet]
+  deriving (Eq, Show)
+
+data Samenet = Samenet Ident Ident Double
+  deriving (Eq, Show)
+
 
 data Site = Site SiteName [SiteOption] Ident
   deriving (Eq, Show)
@@ -94,6 +106,9 @@ data SiteOption
   deriving (Eq, Show)
 
 data Macro = Macro MacroName [MacroOption] Ident
+  deriving (Eq, Show)
+
+data Table = Table [Double] [[Double]]
   deriving (Eq, Show)
 
 type MacroName = Ident
@@ -118,10 +133,14 @@ data MacroPinOption
   | MacroPinDirection PortDirection (Maybe Ident)
   | MacroPinShape Ident
   | MacroPinPort [MacroPinPortInfo]
+  | MacroPinAntennaPartialMetalArea Double Ident
+  | MacroPinAntennaPartialMetalSideArea Double Ident
+  | MacroPinAntennaGateArea Double
+  | MacroPinAntennaDiffArea Double
   deriving (Eq, Show)
 
 data MacroPinPortInfo
-  = MacroPinPortLayer Ident
+  = MacroPinPortLayer Ident [[Double]]
   | MacroPinPortRect Double Double Double Double
   | MacroPinPortClass Ident
   | MacroPinPortWidth Double
@@ -129,7 +148,7 @@ data MacroPinPortInfo
   deriving (Eq, Show)
 
 data MacroObsInfo
-  = MacroObsLayer Ident
+  = MacroObsLayer Ident [[Double]]
   | MacroObsRect Double Double Double Double
   deriving (Eq, Show)
 

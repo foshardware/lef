@@ -33,8 +33,12 @@ data Token
     | Tok_Direction
     | Tok_Pitch
     | Tok_Offset
+    | Tok_Thickness
+    | Tok_Height
     | Tok_Width
     | Tok_Resistance
+    | Tok_Spacingtable
+    | Tok_Parallelrunlength
     | Tok_EdgeCapacitance
     | Tok_Capacitance
     | Tok_Via
@@ -43,9 +47,12 @@ data Token
     | Tok_To
     | Tok_By
     | Tok_Overhang
+    | Tok_Enclosure
     | Tok_MetalOverhang
+    | Tok_Samenet
     | Tok_Site
     | Tok_Symmetry
+    | Tok_Stack
     | Tok_Class
     | Tok_Size
     | Tok_Macro
@@ -53,6 +60,10 @@ data Token
     | Tok_Origin
     | Tok_Use
     | Tok_UseMinSpacing
+    | Tok_Antennapartialmetalarea
+    | Tok_Antennapartialmetalsidearea
+    | Tok_Antennagatearea
+    | Tok_Antennadiffarea
     | Tok_Shape
     | Tok_Port
     | Tok_Path
@@ -65,6 +76,7 @@ data Token
     | Tok_Vertical
     | Tok_Power
     | Tok_Ground
+    | Tok_Polygon
 
     -- Identifiers
     | Tok_Ident Text
