@@ -4,14 +4,15 @@ module Language.LEF.Parser where
 
 import Control.Applicative (optional)
 import Control.Monad
+import Data.Bifunctor
+import Data.Char
+import Data.Maybe
 import Data.Text (Text)
 import qualified Data.Text as T
 import Text.Parsec hiding (option, optional)
 import Text.Parsec.String (GenParser)
 import Text.Parsec.Pos
 import Prelude hiding (null)
-
-import Text.Parsec.Number (floating3, int, sign)
 
 import Language.LEF.Lexer
 import Language.LEF.Syntax
@@ -281,11 +282,43 @@ spacingTable = parallelrunlength_ >> Table
 boolean :: Parser Bool
 boolean = True <$ on_ <|> False <$ off_ <?> "boolean"
 
+
 double :: Parser Double
-double = either (fail . show) pure . parse (sign <*> floating3 False) "double" =<< number
+double = do
+    t <- number
+    case (T.head t, T.findIndex (== '.') t) of
+      ('-', Nothing) -> pure $ fromIntegral $ negate $ numberValue $ T.tail t
+      (_, Nothing) -> pure $ fromIntegral $ numberValue t
+      ('-', Just i)
+         | (a, b) <- T.splitAt i t -> pure
+         $ fromIntegral (negate $ numberValue $ T.tail a)
+         - fractionValue (T.tail b)
+      (_, Just i)
+         | (a, b) <- T.splitAt i t -> pure
+         $ fromIntegral (numberValue a)
+         + fractionValue (T.tail b)
+
 
 integer :: Parser Integer
-integer = either (fail . show) pure . parse int "integer" =<< number
+integer = do
+    t <- number
+    case T.head t of
+      '-' -> pure $ fromIntegral $ negate $ numberValue $ T.tail t
+      _   -> pure $ fromIntegral $ numberValue t
+
+
+numberValue :: Text -> Int
+numberValue = T.foldl (\ x c -> 10 * x + digitToInt c) 0
+
+
+fractionValue :: Text -> Double
+fractionValue
+    = uncurry (/)
+    . bimap fromIntegral fromIntegral
+    . T.foldl (\ (s, p) d -> (p * digitToInt d + s, p * 10)) (0, 1)
+    . T.dropWhile (== '0')
+    . T.reverse
+
 
 maybeToken :: (Token -> Maybe a) -> Parser a
 maybeToken test = token showT posT testT
