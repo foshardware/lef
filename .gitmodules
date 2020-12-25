@@ -1,0 +1,3 @@
+[submodule "ibm-place2"]
+	path = ibm-place2
+	url = https://github.com/foshardware/ibm-place2.git
