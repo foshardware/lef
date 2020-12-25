@@ -17,3 +17,12 @@ main = do
 
 ```
 
+## Tests
+
+```bash
+
+git submodule update --init --recursive
+stack test
+
+
+```

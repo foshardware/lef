@@ -77,6 +77,10 @@ data Token
     | Tok_Power
     | Tok_Ground
     | Tok_Polygon
+    | Tok_Range
+    | Tok_Analog
+    | Tok_Clock
+    | Tok_Signal
 
     -- Identifiers
     | Tok_Ident Text

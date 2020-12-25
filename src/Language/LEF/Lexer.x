@@ -115,6 +115,10 @@ power            { constTok Tok_Power }
 GROUND           { constTok Tok_Ground }
 ground           { constTok Tok_Ground }
 POLYGON          { constTok Tok_Polygon }
+RANGE            { constTok Tok_Range }
+ANALOG           { constTok Tok_Analog }
+CLOCK            { constTok Tok_Clock }
+SIGNAL           { constTok Tok_Signal }
 ANTENNAPARTIALMETALAREA      { constTok Tok_Antennapartialmetalarea }
 ANTENNAPARTIALMETALSIDEAREA  { constTok Tok_Antennapartialmetalsidearea }
 ANTENNAGATEAREA              { constTok Tok_Antennagatearea }

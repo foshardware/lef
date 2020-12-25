@@ -29,7 +29,7 @@ type LayerName = Ident
 
 data LayerOption
   = Type Ident
-  | LayerSpacing Double
+  | LayerSpacing Double [SpacingOption]
   | Direction LayerDirection
   | Pitch Double
   | Offset Double
@@ -40,6 +40,10 @@ data LayerOption
   | Capacitance Ident Double
   | EdgeCapacitance Double
   | SpacingTable Table
+  deriving (Eq, Show)
+
+data SpacingOption
+  = Range Double Double
   deriving (Eq, Show)
 
 data PortDirection = Input | Output | InputOutput
@@ -113,7 +117,7 @@ data Table = Table [Double] [[Double]]
 
 type MacroName = Ident
 
-data Power = Power | Ground
+data PinUsage = Analog | Clock | Ground | Power | Signal
   deriving (Eq, Show)
 
 data MacroOption
@@ -129,7 +133,7 @@ data MacroOption
 
 data MacroPinOption
   = MacroPinName Ident
-  | MacroPinUse Power
+  | MacroPinUse PinUsage
   | MacroPinDirection PortDirection (Maybe Ident)
   | MacroPinShape Ident
   | MacroPinPort [MacroPinPortInfo]

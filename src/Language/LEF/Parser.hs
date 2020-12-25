@@ -97,7 +97,7 @@ layerName = layer_ *> ident <?> "layer_name"
 layerOption :: Parser LayerOption
 layerOption
   =   Type         <$> (type_        *> ident ) 
-  <|> LayerSpacing <$> (spacing_     *> double)
+  <|> LayerSpacing <$> (spacing_     *> double) <*> many spacingOption
   <|> Direction    <$> (direction_   *> layerDirection)
   <|> Pitch        <$> (pitch_       *> double)
   <|> Offset       <$> (offset_      *> double <* optional double)
@@ -109,6 +109,11 @@ layerOption
   <|> Capacitance  <$> (capacitance_ *> ident ) <*> double
   <|> EdgeCapacitance <$> (edgecapacitance_ *> double)
   <?> "layer_option"
+
+spacingOption :: Parser SpacingOption
+spacingOption
+  =   Range <$> (range_ *> double) <*> double
+  <?> "spacing_option"
 
 via :: Parser Via
 via = via_ >> Via
@@ -213,8 +218,14 @@ macro = Macro
 macroName :: Parser MacroName
 macroName = macro_ *> ident <?> "macro_name"
 
-power :: Parser Power
-power = Power <$ power_ <|> Ground <$ ground_
+pinUsage :: Parser PinUsage
+pinUsage
+  =   Analog <$ analog_
+  <|> Clock  <$ clock_
+  <|> Ground <$ ground_
+  <|> Power  <$ power_
+  <|> Signal <$ signal_
+  <?> "pin_usage"
 
 macroOption :: Parser MacroOption
 macroOption
@@ -237,7 +248,7 @@ macroObsInfo
 macroPinOption :: Parser MacroPinOption
 macroPinOption
   =   MacroPinName      <$> (pin_ *> ident)
-  <|> MacroPinUse       <$> (use_ *> power)
+  <|> MacroPinUse       <$> (use_ *> pinUsage)
   <|> MacroPinDirection <$> (direction_ *> portDirection) <*> optional ident
   <|> MacroPinShape     <$> (shape_ *> ident)
   <|> MacroPinPort      <$> (port_  *> many macroPinPortInfo) <* end_
@@ -249,7 +260,7 @@ macroPinOption
 
 macroPinPortInfo :: Parser MacroPinPortInfo
 macroPinPortInfo
-  =   MacroPinPortLayer <$> (layer_ *> ident ) <*> many1 (polygon_ *> many1 double)
+  =   MacroPinPortLayer <$> (layer_ *> ident ) <*> many (polygon_ *> many1 double)
   <|> MacroPinPortRect  <$> (rect_  *> double) <*> double <*> double <*> double
   <|> MacroPinPortClass <$> (class_ *> ident )
   <|> MacroPinPortWidth <$> (width_ *> double)
@@ -297,7 +308,7 @@ double = do
          | (a, b) <- T.splitAt i t -> pure
          $ fromIntegral (numberValue a)
          + fractionValue (T.tail b)
-
+  <?> "double"
 
 integer :: Parser Integer
 integer = do
@@ -305,6 +316,7 @@ integer = do
     case T.head t of
       '-' -> pure $ fromIntegral $ negate $ numberValue $ T.tail t
       _   -> pure $ fromIntegral $ numberValue t
+  <?> "integer"
 
 
 numberValue :: Text -> Int
@@ -408,3 +420,7 @@ thickness_ = p Tok_Thickness
 power_ = p Tok_Power
 ground_ = p Tok_Ground
 polygon_ = p Tok_Polygon
+range_ = p Tok_Range
+analog_ = p Tok_Analog
+clock_ = p Tok_Clock
+signal_ = p Tok_Signal
