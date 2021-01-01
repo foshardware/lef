@@ -327,7 +327,7 @@ fractionValue :: Text -> Double
 fractionValue
     = uncurry (/)
     . bimap fromIntegral fromIntegral
-    . T.foldl (\ (s, p) d -> (p * digitToInt d + s, p * 10)) (0, 1)
+    . T.foldl (\ (s, x) d -> (x * digitToInt d + s, x * 10)) (0, 1)
     . T.dropWhile (== '0')
     . T.reverse
 

@@ -1,14 +1,21 @@
 name:                lef
-version:             0.1.0.1
+version:             0.1.0.2
 github:              "foshardware/lef"
 license:             BSD3
 author:              "Andreas Westerwick"
 maintainer:          "westerwick@pconas.de"
 copyright:           "2019 Andreas Westerwick"
+build-type:          Custom
 
 extra-source-files:
 - README.md
 - ChangeLog.md
+
+custom-setup:
+  dependencies:
+  - base >= 4.7 && < 5
+  - Cabal
+  - process
 
 description:         Please see the README on GitHub at <https://github.com/foshardware/lef#readme>
 
@@ -16,10 +23,16 @@ dependencies:
 - base >= 4.7 && < 5
 - array
 - parsec
+- tasty
+- tasty-hunit
+- tasty-quickcheck
 - text
 
 library:
   source-dirs: src
+  ghc-options:
+  - -Wall
+  - -O2
 
 tests:
   lef-test:
@@ -27,13 +40,9 @@ tests:
     source-dirs:         test
     ghc-options:
     - -Wall
+    - -O
     - -threaded
     - -rtsopts
-    - -with-rtsopts=-N
     dependencies:
     - lef
-    - tasty
-    - tasty-hunit
-    - tasty-quickcheck
-    - file-embed
 

@@ -14,15 +14,12 @@ main = do
   file <- Text.readFile "my.lef"
   putStrLn $ show $ parseLEF file
 
-
 ```
 
 ## Tests
 
 ```bash
 
-git submodule update --init --recursive
 stack test
-
 
 ```
