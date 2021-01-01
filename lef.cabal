@@ -5,7 +5,7 @@ cabal-version: 1.24
 -- see: https://github.com/sol/hpack
 
 name:           lef
-version:        0.1.0.1
+version:        0.1.0.2
 description:    Please see the README on GitHub at <https://github.com/foshardware/lef#readme>
 homepage:       https://github.com/foshardware/lef#readme
 bug-reports:    https://github.com/foshardware/lef/issues
